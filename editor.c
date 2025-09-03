@@ -12,9 +12,6 @@ void enableRawMode();
 int main() {
   enableRawMode();
 
-  char c;
-  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
-
   while (1) {
     char c = '\0';
     if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) error("read");
