@@ -1,3 +1,4 @@
+/*** INCLUDES ****/
 #include <errno.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -5,10 +6,14 @@
 #include <termios.h>
 #include <unistd.h>
 
+/*** DATA ***/
 struct termios orig_termios;
+
+/*** TERMINAL FUNCTION PROTOTYPES ***/
 void error(const char *s);
 void enableRawMode();
 
+/*** INIT ***/
 int main() {
   enableRawMode();
 
@@ -28,6 +33,7 @@ int main() {
   return 0;
 }
 
+/*** TERMINAL ***/
 void disableRawMode() {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     error("tcsetattr");
