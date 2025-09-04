@@ -9,7 +9,7 @@
 /*** DATA ***/
 struct termios orig_termios;
 
-/*** TERMINAL FUNCTION PROTOTYPES ***/
+/*** TERMINAL FUNCTIONS PROTOTYPES ***/
 void error(const char *s);
 void enableRawMode();
 
