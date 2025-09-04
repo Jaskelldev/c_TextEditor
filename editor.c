@@ -1,33 +1,30 @@
 /*** INCLUDES ****/
 #include <errno.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
 
+/*** DEFINES ***/
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 /*** DATA ***/
 struct termios orig_termios;
 
-/*** TERMINAL FUNCTIONS PROTOTYPES ***/
+/*** FUNCTIONS PROTOTYPES ***/
 void error(const char *s);
 void enableRawMode();
+char editorReadKey();
+void editorProcessKeyPress();
+void editorClearScreen();
 
 /*** INIT ***/
 int main() {
   enableRawMode();
 
   while (1) {
-    char c = '\0';
-    if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) error("read");
-    if (iscntrl(c)) {
-      printf("%d\r\n", c);
-    }else {
-      printf("%d ('%c')\r\n",c,c);
-    }
-    if (c == 'q') {
-      break;
-    }
+    editorClearScreen();
+    editorProcessKeyPress();
   }
 
   return 0;
@@ -57,4 +54,32 @@ void enableRawMode() {
 void error(const char *s) {
   perror(s);
   exit(1);
+}
+
+char editorReadKey() {
+  int numread;
+  char c;
+  while ((numread = read(STDIN_FILENO, &c, 1)) != 1) {
+    if (numread == -1 && errno != EAGAIN) error("read");
+  }
+  return c;
+}
+
+/*** INPUT ***/
+void editorProcessKeyPress() {
+  char c = editorReadKey();
+
+  switch (c) {
+    case CTRL_KEY('q'):
+      write(STDOUT_FILENO, "\x1b[2J", 4);
+      write(STDOUT_FILENO, "\x1b[H", 3);
+      exit(0);
+      break;
+  }
+}
+
+/*** OUTPUT ***/
+void editorClearScreen(){
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
 }
